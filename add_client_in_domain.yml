@@ -1,0 +1,43 @@
+---
+- name: AJOUTER DES PC DANS UN DOMAINE
+  hosts: adminCenter
+  gather_facts: false
+
+  pre_tasks:
+#    - name: Installer mise à jour
+#      ansible.windows.win_updates:
+#        reboot: no
+#      register: update_res
+
+#    - name: Redemarrer
+#      ansible.windows.win_reboot:
+#      when: update_res.reboot_required
+
+  tasks:
+    - name: Definir IP DNS
+      win_dns_client:
+        adapter_names: '*'
+        ipv4_addresses:
+        - 192.168.1.80
+
+    - name: Modifier le nom d'hôte
+      win_hostname:
+        name: admincenter
+      register: res
+
+    - name: Redemarer
+      win_reboot:
+      when: res.reboot_required
+
+    - name: Promouvoir un poste membre du domaine
+      win_domain_membership:
+        dns_domain_name: lab.local
+        domain_admin_user: Administrateur@lab.local
+        domain_admin_password: Jesuislenouveau2b&}
+        state: domain
+      register: domain_state
+
+    - name: Redemarer
+      win_reboot:
+        msg: "Joining domain. Rebooting..."
+      when: domain_state.reboot_required   

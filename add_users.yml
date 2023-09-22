@@ -1,0 +1,6 @@
+---
+- hosts: domain_server
+  gather_facts: false
+  tasks:
+    - name: Executer une commande dans le shell distant
+      ansible.windows.win_shell: C:\Import_AdUsers.ps1
